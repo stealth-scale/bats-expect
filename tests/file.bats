@@ -185,6 +185,12 @@ setup() {
     assert_fails -p '-- ERROR: assert_file_contains --' assert_file_contains -e "$d/f" '('
 }
 
+@test "assert_file_contains: -- -> ends the options, a path starting with a dash works" {
+    cd "$d" && printf 'dash\n' > ./-e
+    assert_passes assert_file_contains -- -e dash
+    assert_passes assert_file_contains -e -- -e '^d'
+}
+
 @test "assert_file_contains: missing arguments -> usage error" {
     assert_fails -p '-- ERROR: assert_file_contains --' assert_file_contains "$d/f"
 }
