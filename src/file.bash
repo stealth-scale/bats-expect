@@ -610,7 +610,7 @@ expect::file::entries() {
 #######################################
 expect::file::mode() {
     if [[ "$OSTYPE" == darwin* ]]; then
-        stat -f '%OLp' -- "$1"
+        stat -f '%OLp' -- "$1" # LCOV_EXCL_LINE: coverage runs on Linux
     else
         stat -c '%a' -- "$1"
     fi
