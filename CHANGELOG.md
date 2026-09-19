@@ -6,6 +6,10 @@ Every change a user would notice is recorded here. The format follows
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-09-19
+
+First tagged release.
+
 ### Added
 
 - The bats-assert assertions, with the same names, options and byte-identical reports:
@@ -34,6 +38,7 @@ Every change a user would notice is recorded here. The format follows
 - Meta assertions: `assert_passes` and `assert_fails`.
 - A `fail` polyfill, so the library loads without bats-support.
 - Reports that survive a broken `PATH`: the report layer uses no external command.
-- A test suite of 339 cases.
+- A test suite of 340 cases.
 
-[Unreleased]: https://github.com/stealth-scale/bats-expect/commits/main
+[Unreleased]: https://github.com/stealth-scale/bats-expect/compare/v1.0.0...main
+[1.0.0]: https://github.com/stealth-scale/bats-expect/releases/tag/v1.0.0
