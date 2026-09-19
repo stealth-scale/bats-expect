@@ -96,10 +96,12 @@ setup() { common_setup; }
 # GROUP 04: assert_is_regex, refute_is_regex
 # ==============================================================================
 
+# The empty pattern is not a case: glibc compiles it and the regcomp of macOS rejects
+# it with REG_EMPTY, and the assertion reports what the platform says.
 @test "assert_is_regex: valid extended regular expression -> passes" {
     assert_passes assert_is_regex 'a+'
     assert_passes assert_is_regex '^[0-9]{2}$'
-    assert_passes assert_is_regex ''
+    assert_passes assert_is_regex '.*'
 }
 
 @test "assert_is_regex: invalid expression -> value is not a valid extended regular expression" {
