@@ -1,0 +1,36 @@
+# Publishes a GitHub release for a version tag, with the matching CHANGELOG.md entry
+# as its notes, after the ci workflow has passed on the tag. The tag is pushed by
+# hand after the changelog entry is on main; see CONTRIBUTING.md. A tag without an
+# entry fails here rather than releasing without notes.
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/ci.yml
+
+  release:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - name: Extract the changelog entry
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          awk -v v="$version" '/^## \[/ { p = index($0, "[" v "]") > 0; next } /^\[[^]]+\]: / { p = 0 } p' CHANGELOG.md > notes.md
+          if [ ! -s notes.md ]; then
+            echo "CHANGELOG.md has no entry for ${version}" >&2
+            exit 1
+          fi
+      - run: gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file notes.md
+        env:
+          GH_TOKEN: ${{ github.token }}
