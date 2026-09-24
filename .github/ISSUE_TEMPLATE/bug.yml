@@ -47,7 +47,7 @@ body:
     id: actual
     attributes:
       label: What happened
-      description: What the runner did instead. Paste the failure report whole rather than a summary of it.
+      description: What the assertion did instead. Paste the failure report whole rather than a summary of it.
       render: shell
     validations:
       required: true

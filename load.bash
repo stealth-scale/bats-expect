@@ -1,7 +1,7 @@
 # Entry point for `load` and `bats_load_library`. Sources the library from src/,
 # the report layer first because every other file prints through it.
 #
-#   load 'test_helper/bats-expect/load'
+#   load 'helpers/bats-expect/load'
 #
 # The library is self-contained. When bats-support is loaded as well, its `fail`
 # is used; otherwise a polyfill with the same contract is defined.

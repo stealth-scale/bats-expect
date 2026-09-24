@@ -6,7 +6,7 @@ assertions on values, variables, types, numbers, arrays, namerefs and JSON that 
 has. One `load`, and no other library is needed.
 
 ```bash
-load 'test_helper/bats-expect/load'
+load 'helpers/bats-expect/load'
 
 @test "release notes are generated" {
     run make notes VERSION=1.2.0
@@ -41,15 +41,18 @@ Replace the `load` lines. Every bats-assert function is here with the same name,
 and failure report, byte for byte: `assert`, `refute`, `assert_success`, `assert_failure`,
 `assert_output`, `refute_output`, `assert_line`, `refute_line`, `assert_stderr`,
 `refute_stderr`, `assert_stderr_line`, `refute_stderr_line`, `assert_equal`,
-`assert_not_equal`, `assert_regex`, `refute_regex`.
+`assert_not_equal`, `assert_regex`, `refute_regex`. One difference in behaviour: on an
+empty output, `assert_line` reports a failure and `refute_line` passes, where bats-assert
+stops both with `lines: parameter not set`.
 
 The common bats-file assertions are here under their bats-file names, arguments in the same
-order. Two differences:
+order. The differences:
 
-- `assert_file_contains PATH TEXT` matches text. bats-file matches a regular expression.
-  Pass `--regexp` for that.
-- `assert_file_owner`, `assert_file_size_equals`, the sticky and setuid checks, and the
-  block, character, socket and fifo checks are not included.
+- `assert_file_contains PATH TEXT` and `assert_file_not_contains` match text. bats-file
+  matches a basic regular expression. Pass `--regexp` for an extended one.
+- `assert_file_owner`, `assert_not_file_owner`, `assert_file_size_equals`,
+  `assert_size_zero`, `assert_size_not_zero`, the setuid, setgid and sticky-bit checks, and
+  the block, character, socket and fifo checks are not included.
 
 When bats-support is loaded, its `fail` is used. Otherwise a polyfill with the same contract
 is defined, so nothing else has to be loaded first.
@@ -153,7 +156,7 @@ By name. Indexed and associative arrays.
 | `assert_array_equal NAME VALUE...`, `refute_array_equal` | the elements, in order, differ from, or equal, the values |
 | `assert_array_length NAME N` | the array does not have `N` elements |
 | `assert_array_empty NAME`, `refute_array_empty` | the array has elements, or none |
-| `assert_array_has_key NAME KEY`, `refute_array_has_key` | the key is absent, or present. An index for an indexed array |
+| `assert_array_has_key NAME KEY`, `refute_array_has_key` | the key is absent, or present. The key is compared as text, never evaluated: an index in decimal for an indexed array |
 
 ### file
 
