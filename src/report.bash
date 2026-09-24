@@ -106,7 +106,8 @@ expect::report::rows() {
 
 #######################################
 # Prints key/value pairs as blocks: `key (N lines):` followed by the value,
-# each line indented by two spaces.
+# each line indented by two spaces. An empty value prints as one empty line,
+# as bats-support prints it.
 #
 # Arguments:
 #   $@ (Strings) - key value [key value ...]
@@ -117,6 +118,7 @@ expect::report::blocks() {
     local line
     while (( $# > 1 )); do
         printf '%s (%d lines):\n' "$1" "$(expect::report::count_lines "$2")"
+        [[ -n "$2" ]] || printf '\n'
         while IFS= read -r line || [[ -n "$line" ]]; do
             printf '  %s\n' "$line"
         done < <(printf '%s' "$2")

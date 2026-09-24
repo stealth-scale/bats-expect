@@ -57,6 +57,12 @@ setup() { common_setup; }
     [ "${lines[2]}" = "  y" ]
 }
 
+@test "expect::report::blocks: empty value -> the header and an empty line, as bats-support prints it" {
+    local printed
+    printed="$(expect::report::blocks expected '' actual $'x\ny'; printf x)"
+    [ "${printed%x}" = $'expected (0 lines):\n\nactual (2 lines):\n  x\n  y\n' ]
+}
+
 @test "expect::report::pairs: single-line values -> rows" {
     run expect::report::pairs 8 expected b actual a
     [ "${lines[0]}" = "expected : b" ]
