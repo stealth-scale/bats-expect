@@ -123,6 +123,12 @@ setup() { common_setup; }
     assert_passes assert_var_equal arr 'a b'
 }
 
+@test "assert_var_equal: array under another IFS -> elements still joined by spaces" {
+    local -a arr=(a b)
+    local IFS=,
+    assert_passes assert_var_equal arr 'a b'
+}
+
 @test "refute_var_equal: other value -> passes" {
     local x=1
     assert_passes refute_var_equal x 2

@@ -222,6 +222,7 @@ expect::variable::value() {
     declaration="$(declare -p "$1" 2>/dev/null)" || return 0
     if [[ "$declaration" == "declare -"[aA]* ]]; then
         local -n expect_variable_ref="$1"
+        local IFS=' '
         printf '%s\n' "${expect_variable_ref[*]}"
     else
         printf '%s\n' "${!1}"
