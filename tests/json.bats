@@ -115,6 +115,16 @@ setup() {
     assert_fails -p 'value : x y' refute_json_has_key "$j" .s
 }
 
+@test "assert_json_has_key: invalid path -> usage error with jq's message" {
+    assert_fails -p '-- ERROR: assert_json_has_key --' assert_json_has_key "$j" '.['
+    assert_fails -p 'jq rejected the path' assert_json_has_key "$j" '.['
+}
+
+@test "refute_json_has_key: invalid path -> usage error, not a pass" {
+    assert_fails -p '-- ERROR: refute_json_has_key --' refute_json_has_key "$j" '.['
+    assert_fails -p 'jq rejected the path' refute_json_has_key "$j" '.['
+}
+
 # ==============================================================================
 # GROUP 04: assert_json_length
 # ==============================================================================

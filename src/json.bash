@@ -120,10 +120,12 @@ assert_json_has_key() {
     local json; local -a rest
     expect::json::input assert_json_has_key "$@" || return 1
     local path="${rest[0]-}"
-    expect::json::require_valid assert_json_has_key "$json" || return 1
-    if ! printf '%s' "$json" | jq -e "$path != null" >/dev/null 2>&1; then
-        expect::report::fail 'JSON has no value at path' 'path' "$path" 'json' "$json"
-    fi
+    local -i result=0
+    expect::json::has_value assert_json_has_key "$json" "$path" || result=$?
+    case "$result" in
+        1) expect::report::fail 'JSON has no value at path' 'path' "$path" 'json' "$json" ;;
+        2) return 1 ;;
+    esac
 }
 
 #######################################
@@ -143,11 +145,13 @@ refute_json_has_key() {
     local json; local -a rest
     expect::json::input refute_json_has_key "$@" || return 1
     local path="${rest[0]-}"
-    expect::json::require_valid refute_json_has_key "$json" || return 1
-    if printf '%s' "$json" | jq -e "$path != null" >/dev/null 2>&1; then
-        expect::report::fail 'JSON has a value at path, but it was expected not to' 'path' "$path" \
-            'value' "$(printf '%s' "$json" | jq -rc "$path")"
-    fi
+    local -i result=0
+    expect::json::has_value refute_json_has_key "$json" "$path" || result=$?
+    case "$result" in
+        0) expect::report::fail 'JSON has a value at path, but it was expected not to' 'path' "$path" \
+               'value' "$(printf '%s' "$json" | jq -rc "$path")" ;;
+        2) return 1 ;;
+    esac
 }
 
 #######################################
@@ -232,6 +236,33 @@ expect::json::require_valid() {
         expect::report::error "$caller" "input is not valid JSON: ${error:-jq rejected the input}"
         return 1
     fi
+}
+
+#######################################
+# Tells whether the jq path has a value other than null. jq -e exits 1 for a
+# last output of null or false, 4 for no output, and 2 or more for an error,
+# which is a usage error here rather than an absent value.
+#
+# Arguments:
+#   $1 (String) - The calling assertion
+#   $2 (String) - The document
+#   $3 (String) - The jq filter
+# Returns:
+#   0 - A value other than null
+#   1 - Absent or null
+#   2 - After a usage error report: invalid document or filter
+#######################################
+expect::json::has_value() {
+    local caller="$1" json="$2" path="$3" error
+    expect::json::require_valid "$caller" "$json" || return 2
+    local -i result=0
+    error="$(printf '%s' "$json" | jq -e "$path != null" 2>&1 >/dev/null)" || result=$?
+    case "$result" in
+        0) return 0 ;;
+        1|4) return 1 ;;
+    esac
+    expect::report::error "$caller" "jq rejected the path \`$path': $error"
+    return 2
 }
 
 #######################################
