@@ -154,8 +154,9 @@ refute_array_empty() {
 }
 
 #######################################
-# Fails when the array has no element under the key. For an indexed array the
-# key is an index.
+# Fails when the array has no element under the key. The key is compared as
+# text with the keys of the array and never evaluated: for an indexed array it
+# is an index in decimal, such as 3.
 #
 # Arguments:
 #   $1 (String) - The array name
@@ -167,14 +168,17 @@ refute_array_empty() {
 assert_array_has_key() {
     expect::array::require assert_array_has_key "${1-}" || return 1
     local -n expect_array_ref="$1"
-    if [[ ! -v "expect_array_ref[${2-}]" ]]; then
-        expect::array::fail 'array has no such key' 'keys' "$(expect::array::join "${!expect_array_ref[@]}")" \
-            'array' "$1" 'key' "${2-}"
-    fi
+    local key
+    for key in "${!expect_array_ref[@]}"; do
+        [[ "$key" == "${2-}" ]] && return 0
+    done
+    expect::array::fail 'array has no such key' 'keys' "$(expect::array::join "${!expect_array_ref[@]}")" \
+        'array' "$1" 'key' "${2-}"
 }
 
 #######################################
-# Fails when the array has an element under the key.
+# Fails when the array has an element under the key. The key is compared as
+# text, as in assert_array_has_key.
 #
 # Arguments:
 #   $1 (String) - The array name
@@ -186,9 +190,14 @@ assert_array_has_key() {
 refute_array_has_key() {
     expect::array::require refute_array_has_key "${1-}" || return 1
     local -n expect_array_ref="$1"
-    if [[ -v "expect_array_ref[${2-}]" ]]; then
-        expect::report::fail 'array has the key' 'array' "$1" 'key' "${2-}" 'value' "${expect_array_ref[${2-}]}"
-    fi
+    local key
+    for key in "${!expect_array_ref[@]}"; do
+        if [[ "$key" == "${2-}" ]]; then
+            expect::report::fail 'array has the key' 'array' "$1" 'key' "$key" 'value' "${expect_array_ref[$key]}"
+            return 1
+        fi
+    done
+    return 0
 }
 
 # ------------------------------------------------------------------------------

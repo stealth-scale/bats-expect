@@ -174,6 +174,18 @@ setup() { common_setup; }
     assert_fails -p 'value : v' refute_array_has_key map k
 }
 
+@test "assert_array_has_key: key -> compared as text, never evaluated" {
+    local -A map=([k]=v)
+    local -a items=(a b c)
+    local marker="$BATS_TEST_TMPDIR/evaluated"
+    assert_fails -p 'array has no such key' assert_array_has_key map "\$(touch $marker)"
+    assert_fails -p 'array has no such key' assert_array_has_key items '1+1'
+    assert_fails -p 'array has no such key' assert_array_has_key items "x[\$(touch $marker)]"
+    assert_passes refute_array_has_key items '1+1'
+    assert_passes refute_array_has_key map "\$(touch $marker)"
+    [ ! -e "$marker" ]
+}
+
 # ==============================================================================
 # GROUP 06: Usage errors
 # ==============================================================================
