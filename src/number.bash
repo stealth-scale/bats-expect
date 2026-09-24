@@ -103,7 +103,9 @@ refute_between() {
 }
 
 #######################################
-# Fails when the actual value is further than delta from the expected one.
+# Fails when the actual value is further than delta from the expected one. The
+# difference is taken to 15 significant digits, so 1234567 is not rounded and
+# 1.1 - 1 is 0.1, within a delta of 0.1.
 #
 # Arguments:
 #   $1 (Number) - The actual value
@@ -116,7 +118,7 @@ refute_between() {
 assert_within_delta() {
     expect::number::require assert_within_delta "${1-}" "${2-}" "${3-}" || return 1
     local difference
-    difference="$(awk -v a="$1" -v b="$2" 'BEGIN { d = a - b; if (d < 0) d = -d; printf "%g", d }')"
+    difference="$(awk -v a="$1" -v b="$2" 'BEGIN { d = a - b; if (d < 0) d = -d; printf "%.15g", d }')"
     if ! expect::number::test "$difference" '<=' "$3"; then
         expect::report::fail 'value is not within delta' 'expected' "$2" 'actual' "$1" 'delta' "$3" 'difference' "$difference"
     fi

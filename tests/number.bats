@@ -107,6 +107,12 @@ setup() { common_setup; }
     assert_fails -p 'difference : 0.5' assert_within_delta 1.5 1 0.1
 }
 
+@test "assert_within_delta: seven significant digits -> compared without rounding to six" {
+    assert_passes assert_within_delta 1234567 0 1234567
+    assert_passes assert_within_delta 1.1 1 0.1
+    assert_fails -p 'difference : 1234568' assert_within_delta 1234568 0 1234567
+}
+
 @test "assert_within_delta: non-number -> usage error" {
     assert_fails -p '-- ERROR: assert_within_delta --' assert_within_delta 1 x 0.1
 }
