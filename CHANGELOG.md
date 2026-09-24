@@ -6,6 +6,23 @@ Every change a user would notice is recorded here. The format follows
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-09-24
+
+### Fixed
+
+- A report that prints an empty value as a block prints the empty line bats-support prints
+  under `name (0 lines):`, so `assert_output ''` against a multi-line output matches
+  bats-assert's report byte for byte.
+- `assert_array_has_key` and `refute_array_has_key` compare the key as text with the keys of
+  the array. The key was a subscript: an index such as `1+1` was evaluated as arithmetic,
+  and on bash 4.4 a command substitution in the key ran.
+- `assert_json_has_key` and `refute_json_has_key` report a jq path jq rejects as a usage
+  error. `refute_json_has_key` passed on such a path, and `assert_json_has_key` reported it
+  as an absent value.
+- `assert_within_delta` takes the difference to 15 significant digits. It rounded to six, so
+  `assert_within_delta 1234567 0 1234567` failed.
+- `assert_var_equal` joins the elements of an array with spaces under any `IFS`.
+
 ## [1.0.0] - 2026-09-19
 
 First tagged release.
@@ -40,5 +57,6 @@ First tagged release.
 - Reports that survive a broken `PATH`: the report layer uses no external command.
 - A test suite of 340 cases.
 
-[Unreleased]: https://github.com/stealth-scale/bats-expect/compare/v1.0.0...main
+[Unreleased]: https://github.com/stealth-scale/bats-expect/compare/v1.0.1...main
+[1.0.1]: https://github.com/stealth-scale/bats-expect/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/stealth-scale/bats-expect/releases/tag/v1.0.0
